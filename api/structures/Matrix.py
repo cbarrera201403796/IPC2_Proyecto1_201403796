@@ -1,4 +1,5 @@
 from ..models.Cell import Cell
+import graphviz
 
 
 class Matrix:
@@ -8,6 +9,7 @@ class Matrix:
         self.__max_rows_size = max_rows_size
         self.__max_cols_size = max_cols_size
         self.__root = None
+        self.__f = None
 
     def search_value(self, col, row):
         found = False
@@ -46,8 +48,8 @@ class Matrix:
                 if row_counter != 1:
                     current.right.up = current.up.right
                     current.up.right.down = current.right
-                print("Pos Col: ", column_counter)
-                print("Pos Row: ", row_counter)
+                # print("Pos Col: ", column_counter)
+                # print("Pos Row: ", row_counter)
                 column_counter += 1
                 current = current.right
                 cells_created += 1
@@ -55,8 +57,8 @@ class Matrix:
             elif going_forward and column_counter == self.__max_cols_size:
                 current.down = Cell()
                 current.down.up = current
-                print("Pos Col: ", column_counter)
-                print("Pos Row: ", row_counter)
+                # print("Pos Col: ", column_counter)
+                # print("Pos Row: ", row_counter)
                 row_counter += 1
                 current = current.down
                 cells_created += 1
@@ -66,16 +68,16 @@ class Matrix:
                 current.left.up = current.up.left
                 current.up.left.down = current.left
                 current.left.right = current
-                print("Pos Col: ", column_counter)
-                print("Pos Row: ", row_counter)
+                # print("Pos Col: ", column_counter)
+                # print("Pos Row: ", row_counter)
                 column_counter -= 1
                 current = current.left
                 cells_created += 1
             elif not going_forward and column_counter == 1:
                 current.down = Cell()
                 current.down.up = current
-                print("Pos Col: ", column_counter)
-                print("Pos Row: ", row_counter)
+                # print("Pos Col: ", column_counter)
+                # print("Pos Row: ", row_counter)
                 if not row_counter == self.__max_rows_size:
                     row_counter += 1
                 current = current.down
@@ -91,30 +93,83 @@ class Matrix:
                 else:
                     current.status = Cell.STATUS_NON_INFECTED
 
-    def iterate_matrix(self):
+    def get_node_name(self, node):
+        if node:
+            return str(node.col) + str(node.row)
+        else:
+            return ''
+
+    def iterate_matrix_and_get_graph(self, file_name):
+        self.__f = graphviz.Digraph(filename=file_name + ".gv", engine='neato', graph_attr={'splines': 'true'},
+                     node_attr={'shape': 'point'})
+
         ended = False
         current = self.__root
         going_right = True
+        counter = 1
         while not ended:
-            print("_________________________")
-            print("Col: ", current.col)
-            print("Row: ", current.row)
-            print("Status: ", current.status)
-            print("Top: ", 'None' if current.up is None else current.up)
-            print("Right: ", 'None' if current.right is None else current.right)
-            print("Down: ", 'None' if current.down is None else current.down)
-            print("Left: ", 'None' if current.left is None else current.left)
-            print("_________________________")
+            print("Counter_", counter)
+            if current:
+                self.__f.node(name=self.get_node_name(current),
+                              label=(str(current.col)+","+str(current.row)),
+                              color="red" if current.status == 1 else "black",
+                              fillcolor="red" if current.status == 1 else "white",
+                              shape="box",
+                              pos=str(current.col)+","+str(-1*current.row)+"!")
+
             if going_right and current.right:
                 current = current.right
+                counter += 1
             elif going_right and not current.right:
                 current = current.down
+                counter += 1
                 going_right = False
             elif going_right is False and current.left:
                 current = current.left
+                counter += 1
             elif going_right is False and not current.left:
                 if not current.down:
                     ended = True
                 else:
                     current = current.down
+                    counter += 1
                     going_right = True
+        self.relation_graph()
+
+    def relation_graph(self):
+        ended = False
+        current = self.__root
+        going_right = True
+        counter = 1
+        while not ended:
+            print("Counter_", counter)
+            if current:
+                if current.left:
+                    self.__f.edge(self.get_node_name(current), self.get_node_name(current.left))
+                if current.right:
+                    self.__f.edge(self.get_node_name(current), self.get_node_name(current.right))
+                if current.up:
+                    self.__f.edge(self.get_node_name(current), self.get_node_name(current.up))
+                if current.down:
+                    self.__f.edge(self.get_node_name(current), self.get_node_name(current.down))
+
+            if going_right and current.right:
+                current = current.right
+                counter += 1
+            elif going_right and not current.right:
+                current = current.down
+                counter += 1
+                going_right = False
+            elif going_right is False and current.left:
+                current = current.left
+                counter += 1
+            elif going_right is False and not current.left:
+                if not current.down:
+                    ended = True
+                else:
+                    current = current.down
+                    counter += 1
+                    going_right = True
+
+        self.__f.view()
+
