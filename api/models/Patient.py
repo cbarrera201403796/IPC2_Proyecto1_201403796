@@ -1,4 +1,4 @@
-
+from ..structures.doublelinkedlist.DoubleLinkedList import DoubleLinkedList
 class Patient:
     def __init__(self,
                  name=None,
@@ -7,14 +7,14 @@ class Patient:
                  result=None,
                  matrix_size=None,
                  cell_req_list=None,
-                 generated_periods=None):
+                 generated_periods: DoubleLinkedList=None):
         self.__name = name
         self.__age = age
         self.__periods = periods
         self.__result = result
         self.__matrix_size = matrix_size
         self.__cell_req_list = cell_req_list
-        self.__generated_periods = generated_periods
+        self.__generated_periods: DoubleLinkedList = generated_periods
 
     @property
     def name(self):
@@ -87,3 +87,11 @@ class Patient:
     @cell_req_list.deleter
     def cell_req_list(self):
         self.__cell_req_list = None
+
+    @property
+    def generated_periods(self):
+        return self.__generated_periods
+
+    @generated_periods.setter
+    def generated_periods(self, value):
+        self.__generated_periods = value

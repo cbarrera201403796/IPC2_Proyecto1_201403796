@@ -20,7 +20,7 @@
     </paciente>
     <paciente>
         <datospersonales>
-            <nombre>Juan Pérez</nombre>
+            <nombre>Juan Perez</nombre>
             <edad>20</edad>
         </datospersonales>
         <periodos>6</periodos>
@@ -42,7 +42,7 @@
             <edad>30</edad>
         </datospersonales>
         <periodos>10</periodos>
-        <m>500</m>
+        <m>5</m>
         <rejilla>
             <celda f="1" c="1"/>
             <celda f="1" c="2"/>

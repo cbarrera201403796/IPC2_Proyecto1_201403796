@@ -1,49 +1,29 @@
 from tkinter import filedialog
 
-from api.models.Cell import Cell
-from api.structures.CellReq import CellReq
 from api.structures.Matrix import Matrix
-from api.structures.doublelinkedlist.DoubleLinkedList import DoubleLinkedList
 from api.workers.FileParser import FileParser
+from api.structures.doublelinkedlist.DoubleLinkedList import DoubleLinkedList
 
-filepath = filedialog.askopenfilename(filetypes=[("XML Files", ".xml")])
+fileparser = FileParser(filedialog.askopenfilename(filetypes=[("XML Files", ".xml")]))
+patient_list = fileparser.parse_file()
 
 
-# celList = []
-celList = DoubleLinkedList()
+for i in range(patient_list.size()):
+    patient = patient_list.get(i)
+    matrix_list = DoubleLinkedList()
+    next_period_data = None
+    for p in range(patient.periods):
+        mtxTmp = None
+        if next_period_data:
+            mtxTmp = Matrix(next_period_data, patient.matrix_size, patient.matrix_size)
+        else:
+            mtxTmp = Matrix(patient.cell_req_list, patient.matrix_size, patient.matrix_size)
 
-celList.add(CellReq(row=1, col=1))
-celList.add(CellReq(row=1, col=2))
-celList.add(CellReq(row=2, col=1))
-celList.add(CellReq(row=2, col=2))
-celList.add(CellReq(row=1, col=9))
-celList.add(CellReq(row=1, col=10))
-celList.add(CellReq(row=2, col=9))
-celList.add(CellReq(row=2, col=10))
-celList.add(CellReq(row=5, col=2))
-celList.add(CellReq(row=5, col=3))
-celList.add(CellReq(row=6, col=2))
-celList.add(CellReq(row=6, col=3))
+        mtxTmp.generate_matrix()
+        mtxTmp.iterate_matrix_and_get_graph("Paciente " + patient.name + " Periodo " + str(p+1), patient.name)
+        matrix_list.add(mtxTmp)
+        next_period_data = mtxTmp.get_next_data()
 
-celList.add(CellReq(row=5, col=8))
-celList.add(CellReq(row=5, col=9))
-celList.add(CellReq(row=6, col=8))
-celList.add(CellReq(row=6, col=9))
 
-celList.add(CellReq(row=9, col=1))
-celList.add(CellReq(row=9, col=2))
-celList.add(CellReq(row=10, col=1))
-celList.add(CellReq(row=10, col=2))
-celList.add(CellReq(row=9, col=9))
-celList.add(CellReq(row=9, col=10))
-celList.add(CellReq(row=10, col=9))
-celList.add(CellReq(row=10, col=10))
 
-matrix = Matrix(cell_req_list=celList, max_rows_size=10, max_cols_size=10)
-matrix.generate_matrix()
-matrix.iterate_matrix_and_get_graph("prueba1")
-
-matrix2 = Matrix(cell_req_list=matrix.get_next_data(), max_rows_size=10, max_cols_size=10)
-matrix2.generate_matrix()
-matrix2.iterate_matrix_and_get_graph("prueba2")
 

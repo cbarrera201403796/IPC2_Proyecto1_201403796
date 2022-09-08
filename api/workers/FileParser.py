@@ -24,14 +24,14 @@ class FileParser:
             cells_req_list = DoubleLinkedList()
             for cell in cells:
                 new_cell = CellReq()
-                new_cell.row = cell.getAttribute('f')
-                new_cell.col = cell.getAttribute('c')
+                new_cell.row = int(cell.getAttribute('f'))
+                new_cell.col = int(cell.getAttribute('c'))
                 cells_req_list.add(new_cell)
             tmp_patient = Patient(
                 name=name,
                 age=age,
-                periods=periods,
-                matrix_size=m,
+                periods=int(periods),
+                matrix_size=int(m),
                 cell_req_list=cells_req_list
             )
             mapped_patients.add(tmp_patient)

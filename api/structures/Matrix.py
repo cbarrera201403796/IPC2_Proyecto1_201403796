@@ -13,6 +13,10 @@ class Matrix:
         self.__root = None
         self.__f = None
 
+    @property
+    def graph(self):
+        return self.__f
+
     def search_value(self, col, row):
         found = False
         iterator = 0
@@ -95,8 +99,8 @@ class Matrix:
         else:
             return ''
 
-    def iterate_matrix_and_get_graph(self, file_name):
-        self.__f = graphviz.Digraph(filename=file_name + ".gv", engine='neato', graph_attr={'splines': 'true'},
+    def iterate_matrix_and_get_graph(self, file_name, patient_name):
+        self.__f = graphviz.Digraph(filename="docs-generated/"+patient_name+"/"+file_name + ".gv", engine='neato', graph_attr={'splines': 'true'},
                                     node_attr={'shape': 'point'})
 
         ended = False
@@ -176,7 +180,7 @@ class Matrix:
                     going_right = True
         self.__f.attr(label='Matriz')
         self.__f.attr(fontsize='20')
-        self.__f.view()
+        self.__f.render()
 
 
     def get_total_infected_cells(self, node: Cell):
