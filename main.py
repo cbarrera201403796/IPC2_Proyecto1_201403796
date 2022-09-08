@@ -10,6 +10,6 @@ celList.append(CellReq(row=4, col=4))
 celList.append(CellReq(row=5, col=5))
 
 
-matrix = Matrix(cell_req_list=celList, max_rows_size=10, max_cols_size=10)
+matrix = Matrix(cell_req_list=celList, max_rows_size=20, max_cols_size=20)
 matrix.generate_matrix()
 matrix.iterate_matrix_and_get_graph("prueba")
