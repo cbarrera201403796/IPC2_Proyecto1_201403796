@@ -18,7 +18,7 @@ class CellReq:
 
     @property
     def col(self):
-        return self.__row
+        return self.__col
 
     @col.setter
     def col(self, value):

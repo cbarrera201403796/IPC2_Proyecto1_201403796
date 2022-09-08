@@ -1,4 +1,5 @@
 from ..models.Cell import Cell
+from ..structures.CellReq import CellReq
 import graphviz
 
 
@@ -14,11 +15,11 @@ class Matrix:
     def search_value(self, col, row):
         found = False
         iterator = 0
-        return_value = None
+        return_value = False
         while not found and iterator < len(self.__cell_req_list):
             current_value = self.__cell_req_list[iterator]
             if current_value.col == col and current_value.row == row:
-                return_value = current_value
+                return_value = True
                 found = True
             iterator += 1
 
@@ -38,10 +39,11 @@ class Matrix:
             current.row = row_counter
             current.col = column_counter
             print(str(column_counter) + ",", str(row_counter))
-            if self.search_value(col=column_counter, row=row_counter):
+            if self.search_value(col=current.col, row=current.row):
                 current.status = Cell.STATUS_INFECTED
             else:
                 current.status = Cell.STATUS_NON_INFECTED
+            print('Status: ', current.status)
             if going_forward and column_counter < self.__max_cols_size:
                 current.right = Cell()
                 current.right.left = current
@@ -101,12 +103,17 @@ class Matrix:
         going_right = True
         counter = 1
         while not ended:
-            print("Counter_", counter)
+            # print("Counter_", counter)
+            color = "white"
+            if current.status == 1:
+                color = "red"
             self.__f.node(name=self.get_node_name(current),
-                          label=(str(current.col) + "," + str(current.row)),
-                          color="red" if current.status == 1 else "black",
-                          fillcolor="red" if current.status == 1 else "white",
+                          label=(str(current.row) + "," + str(current.col)),
+                          color="white" if current.status == 1 else "black",
+                          fillcolor=color,
+                          style="filled",
                           shape="box",
+                          fontcolor="white" if current.status == 1 else "black",
                           pos=str(current.col) + "," + str(-1 * current.row) + "!")
 
             if going_right and current.right:
@@ -166,5 +173,136 @@ class Matrix:
                     current = current.down
                     counter += 1
                     going_right = True
-
+        self.__f.attr(label='Matriz')
+        self.__f.attr(fontsize='20')
         self.__f.view()
+
+
+    def get_total_infected_cells(self, node: Cell):
+        count = 0
+        if node.right and node.down and node.left is None and node.up is None:
+            if node.right.status == 1:
+                count += 1
+            if node.right.down.status == 1:
+                count += 1
+            if node.down.status == 1:
+                count += 1
+        elif node.right and node.down and node.left and node.up is None:
+            if node.right.status == 1:
+                count += 1
+            if node.right.down.status == 1:
+                count += 1
+            if node.left.status == 1:
+                count += 1
+            if node.left.down.status == 1:
+                count += 1
+            if node.down.status == 1:
+                count += 1
+        elif node.right is None and node.down and node.left and node.up is None:
+            if node.left.status == 1:
+                count += 1
+            if node.left.down.status == 1:
+                count += 1
+            if node.down.status == 1:
+                count += 1
+        elif node.right and node.down and node.left and node.up:
+            if node.left.status == 1:
+                count += 1
+            if node.right.status == 1:
+                count += 1
+            if node.down.status == 1:
+                count += 1
+            if node.down.left.status == 1:
+                count += 1
+            if node.down.right.status == 1:
+                count += 1
+            if node.up.status == 1:
+                count += 1
+            if node.up.left.status == 1:
+                count += 1
+            if node.up.right.status == 1:
+                count += 1
+        elif node.right is None and node.down and node.left and node.up:
+            if node.left.status == 1:
+                count += 1
+            if node.down.status and node.down.status == 1:
+                count += 1
+            if node.down.status and node.down.left.status == 1:
+                count += 1
+            if node.up.status == 1:
+                count += 1
+            if node.up.left.status == 1:
+                count += 1
+        elif node.right and node.down and node.left is None and node.up:
+            if node.right.status == 1:
+                count += 1
+            if node.down.status == 1:
+                count += 1
+            if node.down.status and node.down.right.status == 1:
+                count += 1
+            if node.up.status == 1:
+                count += 1
+            if node.up.right.status == 1:
+                count += 1
+        elif node.right is None and node.down is None and node.left and node.up:
+            if node.left.status == 1:
+                count += 1
+            if node.up.status == 1:
+                count += 1
+            if node.up.left.status == 1:
+                count += 1
+        elif node.right and node.down is None and node.left and node.up:
+            if node.left.status == 1:
+                count += 1
+            if node.right.status == 1:
+                count += 1
+            if node.up.status == 1:
+                count += 1
+            if node.up.left.status == 1:
+                count += 1
+            if node.up.right.status == 1:
+                count += 1
+        elif node.right is None and node.down is None and node.left and node.up:
+            if node.left.status == 1:
+                count += 1
+            if node.up.status == 1:
+                count += 1
+            if node.up.left.status == 1:
+                count += 1
+        return count
+
+    def get_next_data(self):
+        ended = False
+        current = self.__root
+        going_right = True
+        counter = 1
+        cell_req_list = []
+        while not ended:
+            infected = self.get_total_infected_cells(current)
+            cell = CellReq(col=current.col, row=current.row)
+            if current.status == 1 and (infected == 2 or infected == 3):
+                cell_req_list.append(cell)
+            elif current.status == 0 and infected == 3:
+                cell_req_list.append(cell)
+
+            if going_right and current.right:
+                current = current.right
+                counter += 1
+            elif going_right and not current.right:
+                if current.row == self.__max_rows_size:
+                    ended = True
+                else:
+                    current = current.down
+                    counter += 1
+                    going_right = False
+            elif going_right is False and current.left:
+                current = current.left
+                counter += 1
+            elif going_right is False and not current.left:
+                if current.row == self.__max_rows_size:
+                    ended = True
+                else:
+                    current = current.down
+                    counter += 1
+                    going_right = True
+        return cell_req_list
