@@ -1,5 +1,6 @@
 from ..models.Cell import Cell
 from ..structures.CellReq import CellReq
+from ..structures.doublelinkedlist.DoubleLinkedList import DoubleLinkedList
 import graphviz
 
 
@@ -16,8 +17,8 @@ class Matrix:
         found = False
         iterator = 0
         return_value = False
-        while not found and iterator < len(self.__cell_req_list):
-            current_value = self.__cell_req_list[iterator]
+        while not found and iterator < self.__cell_req_list.size():
+            current_value = self.__cell_req_list.get(iterator)
             if current_value.col == col and current_value.row == row:
                 return_value = True
                 found = True
@@ -276,14 +277,14 @@ class Matrix:
         current = self.__root
         going_right = True
         counter = 1
-        cell_req_list = []
+        cell_req_list = DoubleLinkedList()
         while not ended:
             infected = self.get_total_infected_cells(current)
             cell = CellReq(col=current.col, row=current.row)
             if current.status == 1 and (infected == 2 or infected == 3):
-                cell_req_list.append(cell)
+                cell_req_list.add(cell)
             elif current.status == 0 and infected == 3:
-                cell_req_list.append(cell)
+                cell_req_list.add(cell)
 
             if going_right and current.right:
                 current = current.right
